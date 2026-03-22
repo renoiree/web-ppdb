@@ -42,10 +42,12 @@
   const adminFilterStatus = document.getElementById("admin-filter-status");
   const appLevelSelect = document.getElementById("app-level");
   const appTargetSchoolSelect = document.getElementById("app-target-school");
+  const appPathSelect = document.getElementById("app-path");
   const positionCheckLevel = document.getElementById("position-check-level");
   const positionCheckSchool = document.getElementById("position-check-school");
   const positionTableBody = document.getElementById("position-table-body");
   const refreshPositionButton = document.getElementById("refresh-position-button");
+  const documentRequirementHint = document.getElementById("document-requirement-hint");
 
   let supabaseClient = null;
   let currentProfile = null;
@@ -85,6 +87,7 @@
   appLevelSelect.addEventListener("change", () => {
     renderTargetSchoolOptions(appLevelSelect.value, appTargetSchoolSelect);
   });
+  appPathSelect.addEventListener("change", renderDocumentRequirementHint);
   positionCheckLevel.addEventListener("change", () => {
     renderTargetSchoolOptions(positionCheckLevel.value, positionCheckSchool, true);
     loadSchoolPositionOverview();
@@ -258,6 +261,7 @@
       document.getElementById("app-level").value = currentProfile.school_level || "SD";
       document.getElementById("app-path").value = currentProfile.admission_path || "Zonasi";
       renderTargetSchoolOptions(document.getElementById("app-level").value, appTargetSchoolSelect);
+      renderDocumentRequirementHint();
       setValue("student-full-name", currentProfile.full_name);
       setValue("student-phone", currentProfile.phone);
       updateStatusBadge(statusBadge, "");
@@ -280,6 +284,7 @@
     setValue("app-level", currentApplication.school_level);
     setValue("app-path", currentApplication.admission_path);
     renderTargetSchoolOptions(currentApplication.school_level, appTargetSchoolSelect);
+    renderDocumentRequirementHint();
     setValue("app-target-school", currentApplication.target_school_name);
     setValue("app-major-choice", currentApplication.major_choice);
     setValue("app-average-score", currentApplication.average_score);
@@ -301,9 +306,12 @@
     event.preventDefault();
     const { data: userData } = await supabaseClient.auth.getUser();
     if (!userData.user) return showAlert("Sesi tidak ditemukan. Silakan login ulang.", true);
+    if (!studentForm.reportValidity()) return activateMenu("user-student-panel");
+    if (!applicationForm.reportValidity()) return;
 
     if (desiredSubmissionState === "pending") {
-      const missingDocs = requiredDocumentTypes.filter((type) => !currentDocuments.some((doc) => doc.document_type === type));
+      const missingDocs = getRequiredDocumentTypes(getValue("app-path"))
+        .filter((type) => !currentDocuments.some((doc) => doc.document_type === type));
       if (missingDocs.length) {
         return showAlert(`Dokumen wajib belum lengkap: ${missingDocs.map((type) => documentFieldMap[type].label).join(", ")}.`, true);
       }
@@ -343,6 +351,8 @@
     if (error) return showAlert(error.message, true);
 
     currentApplication = data;
+    await syncDocumentApplicationLinks(data.id);
+    await loadUserDocuments(userData.user.id);
     populateApplication();
     await loadUserHistory(userData.user.id);
     await loadUserPosition();
@@ -352,6 +362,7 @@
 
   async function saveStudentData() {
     if (!currentProfile) return showAlert("Sesi tidak ditemukan.", true);
+    if (!studentForm.reportValidity()) return;
 
     const profilePayload = {
       full_name: getValue("student-full-name"),
@@ -401,6 +412,7 @@
     if (error) return showAlert(error.message, true);
 
     currentApplication = data;
+    await syncDocumentApplicationLinks(data.id);
     populateApplication();
     await loadUserHistory(currentProfile.id);
     showAlert("Data siswa berhasil disimpan.");
@@ -453,6 +465,22 @@
       link.textContent = `Lihat file: ${doc.file_name}`;
       link.classList.remove("hidden");
     });
+  }
+
+  async function syncDocumentApplicationLinks(applicationId) {
+    if (!applicationId || !currentProfile) return;
+    const unlinkedIds = currentDocuments
+      .filter((doc) => !doc.application_id)
+      .map((doc) => doc.id);
+    if (!unlinkedIds.length) return;
+
+    const { error } = await supabaseClient
+      .from("application_documents")
+      .update({ application_id: applicationId })
+      .in("id", unlinkedIds);
+    if (error) {
+      showAlert("Formulir tersimpan, tapi ada dokumen yang belum tertaut ke pendaftaran.", true);
+    }
   }
 
   async function loadAdminData() {
@@ -589,9 +617,18 @@
           ${showStatus ? `<span class="status-badge ${row.is_published ? "accepted" : "draft"}">${row.is_published ? "Publish" : "Draft"}</span>` : ""}
         </div>
         <p>${escapeHtml(row.content || "-")}</p>
-        <span class="news-meta">${escapeHtml(formatDateTime(row.created_at))}</span>
+        <div class="news-card-foot">
+          <span class="news-meta">${escapeHtml(formatDateTime(row.created_at))}</span>
+          ${showStatus ? `<button class="danger-button news-delete-button" data-announcement-delete="${row.id}" type="button">Hapus</button>` : ""}
+        </div>
       </article>
     `).join("");
+
+    if (showStatus) {
+      container.querySelectorAll("[data-announcement-delete]").forEach((button) => {
+        button.addEventListener("click", () => deleteAnnouncement(button.dataset.announcementDelete));
+      });
+    }
   }
 
   function renderAdminStats(rows) {
@@ -623,7 +660,7 @@
   function renderAdminSchools() {
     if (!adminSchoolsBody) return;
     if (!schoolTargets.length) {
-      adminSchoolsBody.innerHTML = '<tr><td colspan="3" class="empty-state">Belum ada sekolah.</td></tr>';
+      adminSchoolsBody.innerHTML = '<tr><td colspan="4" class="empty-state">Belum ada sekolah.</td></tr>';
       return;
     }
 
@@ -632,8 +669,13 @@
         <td>${escapeHtml(row.school_name || "-")}</td>
         <td>${escapeHtml(row.school_level || "-")}</td>
         <td>${escapeHtml(row.quota ?? "-")}</td>
+        <td><button class="danger-button" data-school-delete="${row.id}" type="button">Hapus</button></td>
       </tr>
     `).join("");
+
+    adminSchoolsBody.querySelectorAll("[data-school-delete]").forEach((button) => {
+      button.addEventListener("click", () => deleteSchoolTarget(button.dataset.schoolDelete));
+    });
   }
 
   function renderFilteredAdminTable() {
@@ -797,6 +839,15 @@
     showAlert("Berita berhasil ditambahkan.");
   }
 
+  async function deleteAnnouncement(id) {
+    const confirmed = window.confirm("Hapus berita ini?");
+    if (!confirmed) return;
+    const { error } = await supabaseClient.from("announcements").delete().eq("id", id);
+    if (error) return showAlert(error.message, true);
+    await loadAnnouncements();
+    showAlert("Berita berhasil dihapus.");
+  }
+
   async function saveSchoolTarget(event) {
     event.preventDefault();
     const payload = {
@@ -812,6 +863,17 @@
     renderAdminSchools();
     await loadAdminPosition();
     showAlert("Sekolah berhasil ditambahkan.");
+  }
+
+  async function deleteSchoolTarget(id) {
+    const confirmed = window.confirm("Hapus sekolah ini dari daftar tujuan?");
+    if (!confirmed) return;
+    const { error } = await supabaseClient.from("school_targets").delete().eq("id", id);
+    if (error) return showAlert(error.message, true);
+    await loadSchoolTargets();
+    renderAdminSchools();
+    await loadAdminPosition();
+    showAlert("Sekolah berhasil dihapus.");
   }
 
   async function logout() {
@@ -967,6 +1029,24 @@
     } catch {
       return value;
     }
+  }
+
+  function getRequiredDocumentTypes(path) {
+    const base = [...requiredDocumentTypes];
+    if (path === "Prestasi" || path === "Non Akademik") {
+      base.push("achievement_certificate");
+    }
+    if (path === "Perpindahan Tugas Orang Tua/Wali") {
+      base.push("parent_transfer_letter");
+    }
+    return base;
+  }
+
+  function renderDocumentRequirementHint() {
+    if (!documentRequirementHint) return;
+    const path = getValue("app-path") || "Zonasi";
+    const labels = getRequiredDocumentTypes(path).map((type) => documentFieldMap[type].label);
+    documentRequirementHint.textContent = `Dokumen wajib jalur ${path}: ${labels.join(", ")}.`;
   }
 })();
 

@@ -13,19 +13,17 @@
   <div class="page-shell">
     <main class="content-grid">
       <section class="public-home" id="public-home">
-        <header class="hero">
-          <div class="hero-copy">
-            <span class="eyebrow">PPDB</span>
-            <h1>Web Pendaftaran Peserta Didik Baru</h1>
-            <p>Sistem pendaftaran untuk SD, SMP, SMA, dan SMK dalam satu platform.</p>
-          </div>
-        </header>
-
         <section class="panel auth-panel" id="auth-panel">
+          <header class="hero">
+            <div class="hero-copy hero-copy-merged">
+              <h1>Web Pendaftaran Peserta Didik Baru</h1>
+              <p>Sistem pendaftaran untuk SD, SMP, SMA, dan SMK dalam satu platform.</p>
+            </div>
+          </header>
+
           <div id="alert-box" class="alert-box hidden"></div>
           <div class="panel-head">
             <div>
-              <span class="section-label">Akses Akun</span>
               <h2>Login atau register</h2>
             </div>
           </div>
@@ -252,6 +250,7 @@
                 <h3>Upload dokumen</h3>
               </div>
             </div>
+            <p class="helper-text" id="document-requirement-hint">Dokumen wajib dasar: pas foto, kartu keluarga, akte kelahiran, dan rapor.</p>
             <div class="form-grid upload-grid">
               <label>
                 <span>Pas foto</span>
@@ -528,10 +527,11 @@
                   <th>Sekolah</th>
                   <th>Jenjang</th>
                   <th>Kuota</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="admin-schools-body">
-                <tr><td colspan="3" class="empty-state">Belum ada sekolah.</td></tr>
+                <tr><td colspan="4" class="empty-state">Belum ada sekolah.</td></tr>
               </tbody>
             </table>
           </div>
