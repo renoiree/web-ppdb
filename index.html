@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Pendaftaran Peserta Didik Baru</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <div class="page-shell">
+    <main class="content-grid">
+      <section class="public-home" id="public-home">
+        <header class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow">PPDB</span>
+            <h1>Web Pendaftaran Peserta Didik Baru</h1>
+            <p>Sistem pendaftaran untuk SD, SMP, SMA, dan SMK dalam satu platform.</p>
+          </div>
+        </header>
+
+        <section class="panel auth-panel" id="auth-panel">
+          <div id="alert-box" class="alert-box hidden"></div>
+          <div class="panel-head">
+            <div>
+              <span class="section-label">Akses Akun</span>
+              <h2>Login atau register</h2>
+            </div>
+          </div>
+
+          <div class="tab-row">
+            <button class="tab-button active" data-tab-target="login-tab" type="button">Login</button>
+            <button class="tab-button" data-tab-target="register-tab" type="button">Register</button>
+          </div>
+
+          <form class="form-grid tab-pane active" id="login-tab">
+            <label>
+              <span>Email</span>
+              <input type="email" id="login-email" placeholder="nama@email.com" required>
+            </label>
+            <label>
+              <span>Password</span>
+              <input type="password" id="login-password" placeholder="Minimal 6 karakter" required>
+            </label>
+            <button class="primary-button" type="submit">Masuk</button>
+          </form>
+
+          <form class="form-grid tab-pane" id="register-tab">
+            <label>
+              <span>Nama lengkap</span>
+              <input type="text" id="register-name" placeholder="Nama lengkap" required>
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" id="register-email" placeholder="nama@email.com" required>
+            </label>
+            <label class="full-span">
+              <span>Password</span>
+              <input type="password" id="register-password" placeholder="Minimal 6 karakter" required>
+            </label>
+            <button class="primary-button" type="submit">Buat Akun</button>
+          </form>
+
+          <div class="hidden">
+            <span id="connection-status">Belum terhubung</span>
+            <span id="session-status">Belum login</span>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel hidden" id="user-dashboard">
+        <div class="panel-head">
+          <div>
+            <span class="section-label">Dashboard User</span>
+            <h2 id="user-dashboard-title">Dashboard Pendaftaran</h2>
+          </div>
+          <button class="ghost-button" id="logout-button" type="button">Logout</button>
+        </div>
+
+        <div class="profile-banner">
+          <div>
+            <strong id="profile-name">-</strong>
+            <p id="profile-email">-</p>
+          </div>
+          <div class="badge-stack">
+            <span class="status-badge" id="application-status">Belum daftar</span>
+            <span class="status-badge draft" id="submission-label">Draft</span>
+          </div>
+        </div>
+
+        <div class="dashboard-nav">
+          <button class="menu-button active" data-menu-target="user-news-panel" type="button">Info / Berita</button>
+          <button class="menu-button" data-menu-target="user-student-panel" type="button">Data Siswa</button>
+          <button class="menu-button" data-menu-target="user-registration-panel" type="button">Daftar</button>
+          <button class="menu-button" data-menu-target="user-position-panel" type="button">Cek Posisi</button>
+        </div>
+
+        <section class="panel-block menu-pane active" id="user-news-panel">
+          <div class="panel-head compact">
+            <div>
+              <span class="section-label">Informasi</span>
+              <h3>Info dan berita pendaftaran</h3>
+            </div>
+          </div>
+          <div class="news-list" id="user-news-list">
+            <article class="news-card empty-state-block">Belum ada informasi.</article>
+          </div>
+        </section>
+
+        <section class="panel-block menu-pane" id="user-student-panel">
+          <div class="panel-head compact">
+            <div>
+              <span class="section-label">Data Siswa</span>
+              <h3>Lengkapi data pribadi</h3>
+            </div>
+          </div>
+
+          <form class="form-grid" id="student-form">
+            <label>
+              <span>Nama lengkap</span>
+              <input type="text" id="student-full-name" required>
+            </label>
+            <label>
+              <span>No. HP</span>
+              <input type="tel" id="student-phone">
+            </label>
+            <label>
+              <span>NISN</span>
+              <input type="text" id="app-nisn" required>
+            </label>
+            <label>
+              <span>NIK</span>
+              <input type="text" id="app-nik" required>
+            </label>
+            <label>
+              <span>No. KK</span>
+              <input type="text" id="app-family-card-number" required>
+            </label>
+            <label>
+              <span>Jenis kelamin</span>
+              <select id="app-gender" required>
+                <option value="">Pilih</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+            </label>
+            <label>
+              <span>Tempat lahir</span>
+              <input type="text" id="app-birth-place" required>
+            </label>
+            <label>
+              <span>Tanggal lahir</span>
+              <input type="date" id="app-birth-date" required>
+            </label>
+            <label>
+              <span>Agama</span>
+              <input type="text" id="app-religion" required>
+            </label>
+            <label>
+              <span>Asal sekolah</span>
+              <input type="text" id="app-origin-school" required>
+            </label>
+            <label class="full-span">
+              <span>Alamat lengkap</span>
+              <textarea id="app-address" rows="4" required></textarea>
+            </label>
+            <button class="primary-button" id="save-student-button" type="button">Simpan Data Siswa</button>
+          </form>
+        </section>
+
+        <section class="panel-block menu-pane" id="user-registration-panel">
+          <div class="panel-head compact">
+            <div>
+              <span class="section-label">Daftar</span>
+              <h3>Pilih jenjang, sekolah, jalur, dan upload dokumen</h3>
+            </div>
+          </div>
+
+          <form class="application-layout" id="application-form">
+            <div class="form-grid">
+              <label>
+                <span>Jenjang tujuan</span>
+                <select id="app-level" required>
+                  <option value="SD">SD</option>
+                  <option value="SMP">SMP</option>
+                  <option value="SMA">SMA</option>
+                  <option value="SMK">SMK</option>
+                </select>
+              </label>
+              <label>
+                <span>Sekolah tujuan</span>
+                <select id="app-target-school" required>
+                  <option value="">Pilih sekolah tujuan</option>
+                </select>
+              </label>
+              <label>
+                <span>Jalur pendaftaran</span>
+                <select id="app-path" required>
+                  <option value="Zonasi">Zonasi</option>
+                  <option value="Afirmasi">Afirmasi</option>
+                  <option value="Prestasi">Prestasi</option>
+                  <option value="Akademik">Akademik</option>
+                  <option value="Non Akademik">Non Akademik</option>
+                  <option value="Perpindahan Tugas Orang Tua/Wali">Perpindahan Tugas Orang Tua/Wali</option>
+                </select>
+              </label>
+              <label>
+                <span>Pilihan jurusan</span>
+                <input type="text" id="app-major-choice" placeholder="Khusus SMA/SMK jika ada">
+              </label>
+              <label>
+                <span>Rata-rata nilai</span>
+                <input type="number" id="app-average-score" min="0" max="100" step="0.01" placeholder="Opsional">
+              </label>
+              <label>
+                <span>Jarak ke sekolah (km)</span>
+                <input type="number" id="app-distance-km" min="0" step="0.1" placeholder="Opsional">
+              </label>
+              <label>
+                <span>Nama orang tua / wali</span>
+                <input type="text" id="app-parent-name" required>
+              </label>
+              <label>
+                <span>No. HP orang tua / wali</span>
+                <input type="tel" id="app-parent-phone" required>
+              </label>
+              <label>
+                <span>Pekerjaan orang tua / wali</span>
+                <input type="text" id="app-parent-job" required>
+              </label>
+              <label>
+                <span>Penghasilan orang tua / wali</span>
+                <select id="app-parent-income" required>
+                  <option value="">Pilih rentang</option>
+                  <option value="< 1 juta">< 1 juta</option>
+                  <option value="1 - 3 juta">1 - 3 juta</option>
+                  <option value="3 - 5 juta">3 - 5 juta</option>
+                  <option value="> 5 juta">> 5 juta</option>
+                </select>
+              </label>
+              <label class="full-span">
+                <span>Catatan tambahan</span>
+                <textarea id="app-notes" rows="4" placeholder="Prestasi, afirmasi, atau keterangan lain"></textarea>
+              </label>
+            </div>
+
+            <div class="panel-head compact">
+              <div>
+                <span class="section-label">Dokumen</span>
+                <h3>Upload dokumen</h3>
+              </div>
+            </div>
+            <div class="form-grid upload-grid">
+              <label>
+                <span>Pas foto</span>
+                <input type="file" id="file-photo" accept=".jpg,.jpeg,.png" data-doc-type="student_photo">
+                <a class="file-link hidden" id="link-student-photo" target="_blank" rel="noreferrer">Lihat file</a>
+              </label>
+              <label>
+                <span>Kartu keluarga</span>
+                <input type="file" id="file-family-card" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="family_card">
+                <a class="file-link hidden" id="link-family-card" target="_blank" rel="noreferrer">Lihat file</a>
+              </label>
+              <label>
+                <span>Akte kelahiran</span>
+                <input type="file" id="file-birth-certificate" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="birth_certificate">
+                <a class="file-link hidden" id="link-birth-certificate" target="_blank" rel="noreferrer">Lihat file</a>
+              </label>
+              <label>
+                <span>Rapor / nilai</span>
+                <input type="file" id="file-report-card" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="report_card">
+                <a class="file-link hidden" id="link-report-card" target="_blank" rel="noreferrer">Lihat file</a>
+              </label>
+              <label>
+                <span>Sertifikat prestasi</span>
+                <input type="file" id="file-achievement-certificate" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="achievement_certificate">
+                <a class="file-link hidden" id="link-achievement-certificate" target="_blank" rel="noreferrer">Lihat file</a>
+              </label>
+              <label>
+                <span>Surat perpindahan tugas</span>
+                <input type="file" id="file-parent-transfer-letter" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="parent_transfer_letter">
+                <a class="file-link hidden" id="link-parent-transfer-letter" target="_blank" rel="noreferrer">Lihat file</a>
+              </label>
+            </div>
+
+            <div class="verification-box">
+              <strong id="admin-note-label">Belum ada catatan admin.</strong>
+              <p id="admin-note-text">Lengkapi data dan kirim berkas agar admin bisa memverifikasi.</p>
+            </div>
+
+            <div class="form-actions">
+              <button class="ghost-button" id="save-draft-button" type="button">Simpan Draft</button>
+              <button class="primary-button" id="submit-application-button" type="submit">Kirim Pendaftaran</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel-block menu-pane" id="user-position-panel">
+          <div class="panel-head compact">
+            <div>
+              <span class="section-label">Cek Posisi</span>
+              <h3>Posisi pendaftaran dan riwayat</h3>
+            </div>
+          </div>
+          <div class="mini-stats">
+            <article>
+              <strong id="user-position-school">-</strong>
+              <span>Sekolah tujuan</span>
+            </article>
+            <article>
+              <strong id="user-position-rank">-</strong>
+              <span>Posisi saat ini</span>
+            </article>
+            <article>
+              <strong id="user-position-total">-</strong>
+              <span>Total pesaing</span>
+            </article>
+            <article>
+              <strong id="user-position-remaining">-</strong>
+              <span>Sisa kursi</span>
+            </article>
+          </div>
+          <div class="filter-bar">
+            <select id="position-check-level">
+              <option value="">Semua jenjang</option>
+              <option value="SD">SD</option>
+              <option value="SMP">SMP</option>
+              <option value="SMA">SMA</option>
+              <option value="SMK">SMK</option>
+            </select>
+            <select id="position-check-school">
+              <option value="">Semua sekolah</option>
+            </select>
+            <button class="ghost-button" id="refresh-position-button" type="button">Refresh Posisi</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sekolah</th>
+                  <th>Jenjang</th>
+                  <th>Kuota</th>
+                  <th>Pendaftar</th>
+                  <th>Pending</th>
+                  <th>Diterima</th>
+                  <th>Sisa Kursi</th>
+                </tr>
+              </thead>
+              <tbody id="position-table-body">
+                <tr>
+                  <td colspan="7" class="empty-state">Belum ada data posisi.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="history-list" id="user-history-list">
+            <article class="history-item empty-history">Belum ada riwayat.</article>
+          </div>
+        </section>
+      </section>
+      
+      <section class="panel hidden" id="admin-dashboard">
+        <div class="panel-head">
+          <div>
+            <span class="section-label">Dashboard Admin</span>
+            <h2>Kelola pendaftaran PPDB</h2>
+          </div>
+          <div class="admin-actions">
+            <button class="ghost-button" id="refresh-admin-button" type="button">Refresh</button>
+            <button class="ghost-button" id="logout-admin-button" type="button">Logout</button>
+          </div>
+        </div>
+
+        <div class="mini-stats">
+          <article><strong id="total-registrants">0</strong><span>Total pendaftar</span></article>
+          <article><strong id="draft-count">0</strong><span>Draft</span></article>
+          <article><strong id="pending-count">0</strong><span>Pending</span></article>
+          <article><strong id="accepted-count">0</strong><span>Diterima</span></article>
+          <article><strong id="rejected-count">0</strong><span>Ditolak</span></article>
+        </div>
+
+        <div class="dashboard-nav">
+          <button class="menu-button active" data-menu-target="admin-news-panel" type="button">Info / Berita</button>
+          <button class="menu-button" data-menu-target="admin-students-panel" type="button">Data Siswa</button>
+          <button class="menu-button" data-menu-target="admin-applications-panel" type="button">Pendaftar</button>
+          <button class="menu-button" data-menu-target="admin-position-panel" type="button">Cek Posisi</button>
+          <button class="menu-button" data-menu-target="admin-schools-panel" type="button">Sekolah</button>
+        </div>
+
+        <section class="panel-block menu-pane active" id="admin-news-panel">
+          <form class="form-grid" id="announcement-form">
+            <label>
+              <span>Judul berita</span>
+              <input type="text" id="announcement-title" required>
+            </label>
+            <label>
+              <span>Status</span>
+              <select id="announcement-published">
+                <option value="true">Publish</option>
+                <option value="false">Draft</option>
+              </select>
+            </label>
+            <label class="full-span">
+              <span>Isi berita</span>
+              <textarea id="announcement-content" rows="4" required></textarea>
+            </label>
+            <button class="primary-button" type="submit">Tambah Berita</button>
+          </form>
+          <div class="news-list" id="admin-news-list">
+            <article class="news-card empty-state-block">Belum ada berita.</article>
+          </div>
+        </section>
+
+        <section class="panel-block menu-pane" id="admin-students-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>NISN</th>
+                  <th>NIK</th>
+                  <th>Asal Sekolah</th>
+                  <th>Jenjang</th>
+                  <th>Sekolah Tujuan</th>
+                </tr>
+              </thead>
+              <tbody id="admin-students-body">
+                <tr><td colspan="6" class="empty-state">Belum ada data siswa.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel-block menu-pane" id="admin-applications-panel">
+          <div class="filter-bar">
+            <input type="search" id="admin-search" placeholder="Cari nama, email, NISN, atau asal sekolah">
+            <select id="admin-filter-level">
+              <option value="">Semua jenjang</option>
+              <option value="SD">SD</option>
+              <option value="SMP">SMP</option>
+              <option value="SMA">SMA</option>
+              <option value="SMK">SMK</option>
+            </select>
+            <select id="admin-filter-path">
+              <option value="">Semua jalur</option>
+              <option value="Zonasi">Zonasi</option>
+              <option value="Afirmasi">Afirmasi</option>
+              <option value="Prestasi">Prestasi</option>
+              <option value="Akademik">Akademik</option>
+              <option value="Non Akademik">Non Akademik</option>
+              <option value="Perpindahan Tugas Orang Tua/Wali">Perpindahan</option>
+            </select>
+            <select id="admin-filter-status">
+              <option value="">Semua status</option>
+              <option value="draft">Draft</option>
+              <option value="pending">Pending</option>
+              <option value="accepted">Accepted</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pendaftar</th>
+                  <th>Jenjang</th>
+                  <th>Jalur</th>
+                  <th>Status</th>
+                  <th>Berkas</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body">
+                <tr><td colspan="6" class="empty-state">Belum ada data.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel-block menu-pane" id="admin-position-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sekolah</th>
+                  <th>Jenjang</th>
+                  <th>Kuota</th>
+                  <th>Pendaftar</th>
+                  <th>Pending</th>
+                  <th>Diterima</th>
+                  <th>Sisa Kursi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-position-body">
+                <tr><td colspan="7" class="empty-state">Belum ada data posisi.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel-block menu-pane" id="admin-schools-panel">
+          <form class="form-grid" id="school-form">
+            <label>
+              <span>Jenjang</span>
+              <select id="school-level" required>
+                <option value="SD">SD</option>
+                <option value="SMP">SMP</option>
+                <option value="SMA">SMA</option>
+                <option value="SMK">SMK</option>
+              </select>
+            </label>
+            <label>
+              <span>Kuota</span>
+              <input type="number" id="school-quota" min="1" required>
+            </label>
+            <label class="full-span">
+              <span>Nama sekolah</span>
+              <input type="text" id="school-name" required>
+            </label>
+            <button class="primary-button" type="submit">Tambah Sekolah</button>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sekolah</th>
+                  <th>Jenjang</th>
+                  <th>Kuota</th>
+                </tr>
+              </thead>
+              <tbody id="admin-schools-body">
+                <tr><td colspan="3" class="empty-state">Belum ada sekolah.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <template id="admin-detail-template">
+    <div class="modal-backdrop">
+      <div class="modal-card">
+        <div class="panel-head">
+          <div>
+            <span class="section-label">Detail Pendaftar</span>
+            <h2 id="modal-name">-</h2>
+          </div>
+          <button class="ghost-button" data-close-modal type="button">Tutup</button>
+        </div>
+        <div class="detail-grid" id="modal-detail-grid"></div>
+        <div class="document-links" id="modal-document-links"></div>
+        <div class="history-list" id="modal-history-list"></div>
+        <label class="full-span">
+          <span>Catatan admin</span>
+          <textarea id="modal-admin-notes" rows="4" placeholder="Catatan verifikasi, alasan ditolak, arahan revisi, dll"></textarea>
+        </label>
+        <div class="action-row spaced">
+          <button class="status-action" data-modal-status="draft" type="button">Set Draft</button>
+          <button class="status-action" data-modal-status="pending" type="button">Set Pending</button>
+          <button class="status-action" data-modal-status="accepted" type="button">ACC</button>
+          <button class="status-action" data-modal-status="rejected" type="button">Tolak</button>
+          <button class="danger-button" id="modal-delete-user" type="button">Hapus User</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
